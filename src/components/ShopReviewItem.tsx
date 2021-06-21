@@ -1,5 +1,5 @@
 import React from "react"
-import {View, StyleSheet, Image, Text, Dimensions} from "react-native"
+import {View, StyleSheet, Image, Text, Dimensions, TouchableOpacity} from "react-native"
 import {Shop} from "../types/Shop"
 import {Stars} from "./Stars"
 
@@ -9,17 +9,18 @@ const PADDING = 16
 const IMAGE_WIDTH = CONTAINER_WIDTH - PADDING * 2
 
 type Props = {
-    shop: Shop
+    shop: Shop;
+    onPress: () => void;
 }
-export const ShopReviewItem: React.FC<Props> = ({shop}: Props) => {
+export const ShopReviewItem: React.FC<Props> = ({shop, onPress}: Props) => {
     const {name, place, imageUrl, score} = shop
     return (
-        <View style={styles.container}>
+        <TouchableOpacity style={styles.container} onPress={onPress}>
             <Image style={styles.image} source={{uri: imageUrl}} />
             <Text style={styles.nameText}>{name}</Text>
             <Text style={styles.placeText}>{place}</Text>
             <Stars score={score} />
-        </View>
+        </TouchableOpacity>
     )
 }
 
