@@ -2,11 +2,18 @@ import {StatusBar} from 'expo-status-bar';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, SafeAreaView, FlatList} from 'react-native';
 import {Shop} from "../types/Shop"
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import {getShops} from "../lib/firebase"
 import {ShopReviewItem} from '../components/ShopReviewItem';
+import {RootStackParamList} from "../types/Navigation"
 
-export const HomeScreen = ({navigation}) => {
+type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList,'Home'>;
+type Props = {
+  navigation: ProfileScreenNavigationProp;
+};
+
+export const HomeScreen : React.FC<Props> = ({navigation} : Props) => {
     const [shops, setShops] = useState<Shop[]>([])
     useEffect(() => {
         getFirebaseItems()
@@ -15,11 +22,11 @@ export const HomeScreen = ({navigation}) => {
         const shops = await getShops();
         setShops(shops)
     }
-    const onPressShop = () => {
-        navigation.navigate("Shop")
+    const onPressShop = (shop : Shop) => {
+        navigation.navigate("Shop",{shop})
     }
     const renderItem = ({item}: {item: Shop}) => (
-        <ShopReviewItem shop={item} onPress={onPressShop}/>
+        <ShopReviewItem shop={item} onPress={() => onPressShop(item)}/>
     );
     return (
         <SafeAreaView style={styles.container}>
