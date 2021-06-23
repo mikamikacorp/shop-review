@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useEffect} from "react"
 import {View, StyleSheet, Text} from "react-native"
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
@@ -14,6 +14,9 @@ type Props = {
 
 export const ShopScreen: React.FC<Props> = ({navigation, route}: Props) => {
     const {shop} = route.params
+    useEffect(() => {
+        navigation.setOptions({title: shop.name})
+    }, [shop])
     return (
         <View style={styles.container}>
             <ShopDetail shop={shop} />
@@ -24,7 +27,5 @@ export const ShopScreen: React.FC<Props> = ({navigation, route}: Props) => {
 const styles = StyleSheet.create({
     container: {
         flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center"
     }
 })

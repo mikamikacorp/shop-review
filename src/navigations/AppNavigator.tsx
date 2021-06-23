@@ -1,9 +1,9 @@
 import React from "react"
-import {HomeStackNavigator} from "../navigations/HomeStackNavigator"
+import {MainTabNavigator} from "../navigations/MainTabNavigator"
 
 export const AppNavigator = () => {
     return (
-        <HomeStackNavigator />
+        <MainTabNavigator />
     )
 }
 
