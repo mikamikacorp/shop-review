@@ -1,9 +1,10 @@
 import React, {useEffect} from "react"
-import {View, StyleSheet, Text} from "react-native"
+import {View, StyleSheet} from "react-native"
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from "../types/Navigation"
 import {ShopDetail} from "../components/ShopDetail";
+import {FloatingActionButton} from "../components/FloatingActionButton"
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Shop'>;
 type ProfileScreenRouteProp = RouteProp<RootStackParamList, 'Shop'>;
@@ -20,12 +21,15 @@ export const ShopScreen: React.FC<Props> = ({navigation, route}: Props) => {
     return (
         <View style={styles.container}>
             <ShopDetail shop={shop} />
+            <FloatingActionButton onPress={() => navigation.navigate("CreateReview",{shop})} />
         </View>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: "column",
+        flex :1,
+        backgroundColor: "#fff",
+        justifyContent: "flex-start"
     }
 })
