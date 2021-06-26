@@ -3,6 +3,7 @@ import "firebase/firestore";
 import "firebase/auth";
 import "firebase/storage";
 import {Shop} from "../types/Shop"
+import {initialUser, User} from "../types/User";
 
 if (!firebase.apps.length) {
     const firebaseConfig = {
@@ -18,9 +19,27 @@ if (!firebase.apps.length) {
 }
 
 export const getShops = async () => {
-    const snapshot = await firebase.firestore().collection("shops").orderBy("score","desc").get()
+    const snapshot = await firebase.firestore().collection("shops").orderBy("score", "desc").get()
     const shops = snapshot.docs.map((doc) => {
         return doc.data() as Shop
     })
     return shops
+}
+
+export const signin = async () => {
+    const userCredintial = await firebase.auth().signInAnonymously()
+    const {uid} = userCredintial.user
+    const userDoc = await firebase.firestore().collection("users").doc(uid).get()
+    if (!userDoc.exists) {
+        await firebase.firestore().collection("users").doc(uid).set(initialUser)
+        return {
+            ...initialUser,
+            id : uid
+        } as User
+    }else{
+        return {
+            id : uid,
+            ...userDoc.data()
+        } as User
+    }
 }

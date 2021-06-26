@@ -5,7 +5,7 @@ import {Stars} from "./Stars"
 
 const {width} = Dimensions.get("window")
 const CONTAINER_WIDTH = width / 2
-const PADDING = 16
+const PADDING = 8
 const IMAGE_WIDTH = CONTAINER_WIDTH - PADDING * 2
 
 type Props = {
