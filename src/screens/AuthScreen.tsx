@@ -1,17 +1,19 @@
-import React, {useEffect} from "react"
+import React, {useEffect,useContext} from "react"
 import {SafeAreaView, StyleSheet, ActivityIndicator, Text} from "react-native"
 import {signin} from "../lib/firebase"
 import {User} from "../types/User"
+import {UserContext} from "../contexts/UserContext"
 
 type Props = {
 
 }
 
 export const AuthScreen: React.FC<Props> = ({}: Props) => {
+    const {setUser} = useContext(UserContext)
     useEffect(() => {
         const fetchUser = async () => {
             const user: User = await signin()
-            console.log(user)
+            setUser(user)
         }
         fetchUser()
     }, [])
