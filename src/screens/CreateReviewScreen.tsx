@@ -1,9 +1,11 @@
-import React, {useEffect} from "react"
-import {View, StyleSheet, Text} from "react-native"
+import React, {useEffect,useState} from "react"
+import {View, StyleSheet,Text} from "react-native"
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from "../types/Navigation"
 import {CloseButton} from "../components/CloseButton"
+import {Textarea} from "../components/Textarea"
+import {StarInput} from "../components/StarInput"
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'CreateReview'>;
 type ProfileScreenRouteProp = RouteProp<RootStackParamList, 'CreateReview'>;
@@ -14,15 +16,18 @@ type Props = {
 
 export const CreateReviewScreen: React.FC<Props> = ({route, navigation}: Props) => {
     const {shop} = route.params
+    const [text,setText] = useState<string>("")
+    const [score,setScore] = useState<number>(3)
     useEffect(() => {
         navigation.setOptions({
-            title: shop.name, 
+            title: shop.name,
             headerLeft: () => <CloseButton onPress={() => navigation.goBack()} />
         })
     }, [shop])
     return (
         <View style={styles.container}>
-            <Text>CreateReviewScreen</Text>
+            <StarInput score={score} onChangeScore={(value) => {setScore(value)}} starSize={30} />
+            <Textarea value={text} onChangeText={(value) => {setText(value)} } label={"レビュー"} placeholder={"レビューを書いてください"} />
         </View>
     )
 }
@@ -30,7 +35,6 @@ export const CreateReviewScreen: React.FC<Props> = ({route, navigation}: Props) 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center"
+        flexDirection: "column"
     }
 })
