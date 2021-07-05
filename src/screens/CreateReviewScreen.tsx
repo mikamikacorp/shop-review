@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useContext} from "react"
-import {View, StyleSheet, Image} from "react-native"
+import {View, StyleSheet, Image, Alert} from "react-native"
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
 import {RootStackParamList} from "../types/Navigation"
@@ -7,11 +7,13 @@ import {CloseButton} from "../components/CloseButton"
 import {Textarea} from "../components/Textarea"
 import {StarInput} from "../components/StarInput"
 import {Button} from "../components/Button"
-import {addReview} from "../lib/firebase"
+import {createReviewRef,uploadImage} from "../lib/firebase"
 import {Review, UserRef, ShopRef} from "../types/Review"
 import {UserContext} from "../contexts/UserContext"
 import {CameraButton} from "../components/CameraButton"
 import {pickImage} from "../lib/imagePicker"
+import {getExtension} from "../utils/file"
+import {Loading} from "../components/Loading"
 import firebase from "firebase"
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'CreateReview'>;
@@ -27,6 +29,7 @@ export const CreateReviewScreen: React.FC<Props> = ({route, navigation}: Props) 
     const [score, setScore] = useState<number>(3)
     const [imageUri, setImageUri] = useState<string>("")
     const {user} = useContext(UserContext)
+    const [loading,setLoading] = useState<boolean>(false)
     useEffect(() => {
         navigation.setOptions({
             title: shop.name,
@@ -34,6 +37,21 @@ export const CreateReviewScreen: React.FC<Props> = ({route, navigation}: Props) 
         })
     }, [shop])
     const onSubmit = async () => {
+
+        if(!text || !imageUri){
+            Alert.alert("レビューまたは画像がありません")
+            return
+        }
+
+        setLoading(true)
+
+        const reviewRef = await createReviewRef(shop.id!)
+
+        const ext = getExtension(imageUri)
+        const storagePath = `reviews/${reviewRef.id}.${ext}`
+
+        const downloadUrl = await uploadImage(imageUri,storagePath)
+
         const user_ref: UserRef = {
             id: user?.id!,
             name: user?.name!
@@ -47,14 +65,17 @@ export const CreateReviewScreen: React.FC<Props> = ({route, navigation}: Props) 
             shop: shop_ref,
             text,
             score,
+            imageUrl : downloadUrl,
             updatedAt: firebase.firestore.Timestamp.now(),
             createdAt: firebase.firestore.Timestamp.now()
         } as Review
-        await addReview(shop.id!, review)
+        await reviewRef.set(review)
+        setLoading(false)
+        navigation.goBack()
     }
     const onPickImage = async () => {
         const uri = await pickImage()
-        if(uri){
+        if (uri) {
             setImageUri(uri)
         }
     }
@@ -64,7 +85,8 @@ export const CreateReviewScreen: React.FC<Props> = ({route, navigation}: Props) 
             <Textarea value={text} onChangeText={(value) => {setText(value)}} label={"レビュー"} placeholder={"レビューを書いてください"} />
             <Button text={"レビューを投稿する"} onPress={onSubmit} />
             <CameraButton onPress={onPickImage} />
-            {!!imageUri && <Image source={{uri : imageUri}} style={styles.image} />}
+            {!!imageUri && <Image source={{uri: imageUri}} style={styles.image} />}
+            <Loading visible={loading} />
         </View>
     )
 }
@@ -77,9 +99,9 @@ const styles = StyleSheet.create({
     camera: {
         marginLeft: 10
     },
-    image : {
-        height:100,
-        width : 100,
+    image: {
+        height: 100,
+        width: 100,
         margin: 8
     }
 })
