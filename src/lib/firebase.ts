@@ -66,3 +66,14 @@ export const uploadImage = async (uri : string , path : string) => {
     }
     return downloadUrl
 }
+
+export const getReviews = async (shopId : string) => {
+    const shopReviewDoc = await firebase.firestore().collection("shops").doc(shopId).collection("reviews").orderBy("createdAt","desc").get()
+    const reviews = shopReviewDoc.docs.map((doc) => {
+        return {
+            ...doc.data(),
+            id : doc.id
+        } as Review
+    })
+    return reviews
+}
