@@ -7,13 +7,14 @@ import {CloseButton} from "../components/CloseButton"
 import {Textarea} from "../components/Textarea"
 import {StarInput} from "../components/StarInput"
 import {Button} from "../components/Button"
-import {createReviewRef,uploadImage} from "../lib/firebase"
+import {createReviewRef, uploadImage} from "../lib/firebase"
 import {Review, UserRef, ShopRef} from "../types/Review"
 import {UserContext} from "../contexts/UserContext"
 import {CameraButton} from "../components/CameraButton"
 import {pickImage} from "../lib/imagePicker"
 import {getExtension} from "../utils/file"
 import {Loading} from "../components/Loading"
+import {ReviewsContext} from "../contexts/ReviewsContext"
 import firebase from "firebase"
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'CreateReview'>;
@@ -29,7 +30,8 @@ export const CreateReviewScreen: React.FC<Props> = ({route, navigation}: Props) 
     const [score, setScore] = useState<number>(3)
     const [imageUri, setImageUri] = useState<string>("")
     const {user} = useContext(UserContext)
-    const [loading,setLoading] = useState<boolean>(false)
+    const {reviews,setReviews} = useContext(ReviewsContext)
+    const [loading, setLoading] = useState<boolean>(false)
     useEffect(() => {
         navigation.setOptions({
             title: shop.name,
@@ -38,7 +40,7 @@ export const CreateReviewScreen: React.FC<Props> = ({route, navigation}: Props) 
     }, [shop])
     const onSubmit = async () => {
 
-        if(!text || !imageUri){
+        if (!text || !imageUri) {
             Alert.alert("レビューまたは画像がありません")
             return
         }
@@ -50,7 +52,7 @@ export const CreateReviewScreen: React.FC<Props> = ({route, navigation}: Props) 
         const ext = getExtension(imageUri)
         const storagePath = `reviews/${reviewRef.id}.${ext}`
 
-        const downloadUrl = await uploadImage(imageUri,storagePath)
+        const downloadUrl = await uploadImage(imageUri, storagePath)
 
         const user_ref: UserRef = {
             id: user?.id!,
@@ -61,15 +63,17 @@ export const CreateReviewScreen: React.FC<Props> = ({route, navigation}: Props) 
             name: shop.name
         }
         const review: Review = {
+            id : reviewRef.id,
             user: user_ref,
             shop: shop_ref,
             text,
             score,
-            imageUrl : downloadUrl,
+            imageUrl: downloadUrl,
             updatedAt: firebase.firestore.Timestamp.now(),
             createdAt: firebase.firestore.Timestamp.now()
         } as Review
         await reviewRef.set(review)
+        setReviews([review,...reviews])
         setLoading(false)
         navigation.goBack()
     }

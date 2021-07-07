@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import React, {useEffect, useState, useContext} from "react"
 import {View, StyleSheet, FlatList} from "react-native"
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
@@ -8,6 +8,7 @@ import {FloatingActionButton} from "../components/FloatingActionButton"
 import {getReviews} from "../lib/firebase"
 import {ReviewItem} from "../components/ReviewItem"
 import {Review} from "../types/Review";
+import {ReviewsContext} from "../contexts/ReviewsContext"
 
 type ProfileScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Shop'>;
 type ProfileScreenRouteProp = RouteProp<RootStackParamList, 'Shop'>;
@@ -18,7 +19,8 @@ type Props = {
 
 export const ShopScreen: React.FC<Props> = ({navigation, route}: Props) => {
     const {shop} = route.params
-    const [reviews, setReviews] = useState<Review[]>([])
+    //const [reviews, setReviews] = useState<Review[]>([])
+    const {reviews, setReviews} = useContext(ReviewsContext)
     useEffect(() => {
         navigation.setOptions({title: shop.name})
         const fetchReviews = async () => {
